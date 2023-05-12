@@ -1,4 +1,4 @@
-const { HttpError } = require("../helpers");
+const { HttpError, contactsSchemaValidation } = require("../helpers");
 const {
   listContactsService,
   getContactByIdService,
@@ -7,6 +7,7 @@ const {
   removeContactService,
 } = require("../services/contactsServices");
 
+// *  /api/contacts
 const listContacts = async (req, res, next) => {
   try {
     const contacts = await listContactsService();
@@ -22,7 +23,7 @@ const getContactById = async (req, res, next) => {
     const contact = await getContactByIdService(contactId);
 
     if (!contact) {
-      throw HttpError(404, `Contact with ${contactId} not found`);
+      throw new HttpError(404, `Contact with ${contactId} not found`);
     }
 
     res.json(contact);
@@ -33,6 +34,10 @@ const getContactById = async (req, res, next) => {
 
 const addContact = async (req, res, next) => {
   try {
+    const { error } = contactsSchemaValidation.validate(req.body);
+    if (error) {
+      throw new HttpError(400, error.message);
+    }
     const contact = await addContactService(req.body);
     res.status(201).json(contact);
   } catch (error) {
@@ -43,11 +48,15 @@ const addContact = async (req, res, next) => {
 const updateContact = async (req, res, next) => {
   const { contactId } = req.params;
   try {
+    const { error } = contactsSchemaValidation.validate(req.body);
+    if (error) {
+      throw new HttpError(400, error.message);
+    }
     const contact = await updateContactService(contactId, req.body);
     if (!contact) {
-      throw HttpError(404, `Contact with ${contactId} not found`);
+      throw new HttpError(404, `Contact with ${contactId} not found`);
     }
-    res.status(200).json(contact);
+    res.json(contact);
   } catch (error) {
     next(error);
   }
@@ -58,9 +67,9 @@ const removeContact = async (req, res, next) => {
   try {
     const removedContact = await removeContactService(contactId);
     if (!removedContact) {
-      throw HttpError(404, `Contact with ${contactId} not found`);
+      throw new HttpError(404, `Contact with ${contactId} not found`);
     }
-    res.status(200).json(removedContact);
+    res.json({ message: "contact deleted" });
   } catch (error) {
     next(error);
   }
