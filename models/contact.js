@@ -1,5 +1,11 @@
 const { Schema, model } = require("mongoose");
+const Joi = require("joi");
 const { handleMongooseError } = require("../helpers");
+
+const phoneRegex =
+  /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,3}[-\s.]?[0-9]{1,4}[-\s.]?[0-9]{1,4}$/;
+const emailRegex =
+  /^([a-z0-9_-]+\.)*[a-z0-9_-]+@[a-z0-9_-]+(\.[a-z0-9_-]+)*\.[a-z]{2,6}$/;
 
 const contactSchema = new Schema(
   {
@@ -11,13 +17,11 @@ const contactSchema = new Schema(
     },
     email: {
       type: String,
-      match:
-        /^([a-z0-9_-]+\.)*[a-z0-9_-]+@[a-z0-9_-]+(\.[a-z0-9_-]+)*\.[a-z]{2,6}$/,
+      match: emailRegex,
     },
     phone: {
       type: String,
-      match:
-        /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,3}[-\s.]?[0-9]{1,4}[-\s.]?[0-9]{1,4}$/,
+      match: phoneRegex,
       required: [true, "Set phone for contact"],
     },
     favorite: {
@@ -28,8 +32,37 @@ const contactSchema = new Schema(
   { versionKey: false, timestamps: true }
 );
 
+const contactsSchemaValidation = Joi.object({
+  name: Joi.string().min(3).max(35).required().messages({
+    "any.required": "Missing required 'name' field",
+    "string.min": "The length of 'name' must be between 3 and 35 characters",
+    "string.max": "The length of 'name' must be between 3 and 35 characters",
+  }),
+
+  email: Joi.string()
+    .email()
+    .required()
+    .messages({ "any.required": "Missing required 'email' field" }),
+
+  phone: Joi.string().pattern(new RegExp(phoneRegex)).required().messages({
+    "any.required": "Missing required 'phone' field",
+    "string.pattern.base":
+      "The phone number format is incorrect. Please enter in the format +XX-XXX-XXX-XX-XX",
+  }),
+
+  favorite: Joi.boolean(),
+});
+
+const updateFavoriteSchemaValidation = Joi.object({
+  favorite: Joi.boolean()
+    .required()
+    .messages({ "any.required": "missing field favorite" }),
+});
+
+const schemas = { contactsSchemaValidation, updateFavoriteSchemaValidation };
+
 contactSchema.post("save", handleMongooseError);
 
 const Contact = model("contact", contactSchema);
 
-module.exports = Contact;
+module.exports = { Contact, schemas };
