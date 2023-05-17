@@ -20,6 +20,8 @@ const contactsSchemaValidation = Joi.object({
     "string.pattern.base":
       "The phone number format is incorrect. Please enter in the format +XX-XXX-XXX-XX-XX",
   }),
+
+  favorite: Joi.boolean(),
 });
 
 module.exports = contactsSchemaValidation;
