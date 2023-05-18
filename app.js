@@ -8,12 +8,15 @@ const app = express();
 
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 
+// *** middlewares:
 app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json());
 
+// *** main router:
 app.use("/api/contacts", contactsRouter);
 
+// *** error handlers:
 app.use((req, res) => {
   res.status(404).json({
     status: "error",

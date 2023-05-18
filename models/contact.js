@@ -59,10 +59,10 @@ const updateFavoriteSchemaValidation = Joi.object({
     .messages({ "any.required": "missing field favorite" }),
 });
 
-const schemas = { contactsSchemaValidation, updateFavoriteSchemaValidation };
+const schemes = { contactsSchemaValidation, updateFavoriteSchemaValidation };
 
 contactSchema.post("save", handleMongooseError);
 
 const Contact = model("contact", contactSchema);
 
-module.exports = { Contact, schemas };
+module.exports = { Contact, schemes };

@@ -1,9 +1,8 @@
 const { HttpError } = require("../helpers/");
-const { schemas } = require("../models/contact");
+const { Contact, schemes } = require("../models/contact");
 
-const { Contact } = require("../models/contact");
+// *******************  /api/contacts  ******************
 
-// *  /api/contacts
 const listContacts = async (req, res, next) => {
   try {
     const contacts = await Contact.find({}, "-createdAt -updatedAt");
@@ -30,7 +29,7 @@ const getContactById = async (req, res, next) => {
 
 const addContact = async (req, res, next) => {
   try {
-    const { error } = schemas.contactsSchemaValidation.validate(req.body);
+    const { error } = schemes.contactsSchemaValidation.validate(req.body);
     if (error) {
       throw new HttpError(400, error.message);
     }
@@ -44,7 +43,7 @@ const addContact = async (req, res, next) => {
 const updateContact = async (req, res, next) => {
   const { contactId } = req.params;
   try {
-    const { error } = schemas.contactsSchemaValidation.validate(req.body);
+    const { error } = schemes.contactsSchemaValidation.validate(req.body);
     if (error) {
       throw new HttpError(400, error.message);
     }
@@ -63,7 +62,7 @@ const updateContact = async (req, res, next) => {
 const updateStatusContact = async (req, res, next) => {
   const { contactId } = req.params;
   try {
-    const { error } = schemas.updateFavoriteSchemaValidation.validate(req.body);
+    const { error } = schemes.updateFavoriteSchemaValidation.validate(req.body);
     if (error) {
       throw new HttpError(400, error.message);
     }
