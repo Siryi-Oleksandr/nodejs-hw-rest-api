@@ -1,6 +1,6 @@
 const express = require("express");
 const {
-  listContacts,
+  getContacts,
   getContactById,
   addContact,
   updateContact,
@@ -8,16 +8,17 @@ const {
   removeContact,
 } = require("../../controllers/contactsControllers");
 const isValidId = require("../../middlewares/isValidId");
+const isValidBody = require("../../middlewares/isValidBody");
 
 const router = express.Router();
 
-router.get("/", listContacts);
+router.get("/", getContacts);
 
 router.get("/:contactId", isValidId, getContactById);
 
-router.post("/", addContact);
+router.post("/", isValidBody, addContact);
 
-router.put("/:contactId", isValidId, updateContact);
+router.put("/:contactId", isValidId, isValidBody, updateContact);
 
 router.patch("/:contactId/favorite", isValidId, updateStatusContact);
 

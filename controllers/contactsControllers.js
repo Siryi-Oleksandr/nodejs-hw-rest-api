@@ -1,9 +1,10 @@
 const { HttpError } = require("../helpers/");
-const { Contact, schemes } = require("../models/contact");
+const Contact = require("../models/contact");
+const joiSchemes = require("../helpers/joiSchemaValidation");
 
 // *******************  /api/contacts  ******************
 
-const listContacts = async (req, res, next) => {
+const getContacts = async (req, res, next) => {
   try {
     const contacts = await Contact.find({}, "-createdAt -updatedAt");
     res.json(contacts);
@@ -29,10 +30,6 @@ const getContactById = async (req, res, next) => {
 
 const addContact = async (req, res, next) => {
   try {
-    const { error } = schemes.contactsSchemaValidation.validate(req.body);
-    if (error) {
-      throw new HttpError(400, error.message);
-    }
     const contact = await Contact.create(req.body);
     res.status(201).json(contact);
   } catch (error) {
@@ -43,10 +40,6 @@ const addContact = async (req, res, next) => {
 const updateContact = async (req, res, next) => {
   const { contactId } = req.params;
   try {
-    const { error } = schemes.contactsSchemaValidation.validate(req.body);
-    if (error) {
-      throw new HttpError(400, error.message);
-    }
     const contact = await Contact.findByIdAndUpdate(contactId, req.body, {
       new: true,
     });
@@ -62,7 +55,9 @@ const updateContact = async (req, res, next) => {
 const updateStatusContact = async (req, res, next) => {
   const { contactId } = req.params;
   try {
-    const { error } = schemes.updateFavoriteSchemaValidation.validate(req.body);
+    const { error } = joiSchemes.joiUpdateFavoriteSchemaValidation.validate(
+      req.body
+    );
     if (error) {
       throw new HttpError(400, error.message);
     }
@@ -92,7 +87,7 @@ const removeContact = async (req, res, next) => {
 };
 
 module.exports = {
-  listContacts,
+  getContacts,
   getContactById,
   addContact,
   updateContact,
