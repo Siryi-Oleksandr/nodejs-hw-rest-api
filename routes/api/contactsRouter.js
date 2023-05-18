@@ -7,8 +7,7 @@ const {
   updateStatusContact,
   removeContact,
 } = require("../../controllers/contactsControllers");
-const isValidId = require("../../middlewares/isValidId");
-const isValidBody = require("../../middlewares/isValidBody");
+const { isValidId, isValidBody, isValidStatus } = require("../../middlewares");
 
 const router = express.Router();
 
@@ -20,7 +19,12 @@ router.post("/", isValidBody, addContact);
 
 router.put("/:contactId", isValidId, isValidBody, updateContact);
 
-router.patch("/:contactId/favorite", isValidId, updateStatusContact);
+router.patch(
+  "/:contactId/favorite",
+  isValidId,
+  isValidStatus,
+  updateStatusContact
+);
 
 router.delete("/:contactId", isValidId, removeContact);
 

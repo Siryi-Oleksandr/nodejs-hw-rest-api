@@ -1,6 +1,5 @@
 const { HttpError } = require("../helpers/");
 const Contact = require("../models/contact");
-const joiSchemes = require("../helpers/joiSchemaValidation");
 
 // *******************  /api/contacts  ******************
 
@@ -55,12 +54,6 @@ const updateContact = async (req, res, next) => {
 const updateStatusContact = async (req, res, next) => {
   const { contactId } = req.params;
   try {
-    const { error } = joiSchemes.joiUpdateFavoriteSchemaValidation.validate(
-      req.body
-    );
-    if (error) {
-      throw new HttpError(400, error.message);
-    }
     const contact = await Contact.findByIdAndUpdate(contactId, req.body, {
       new: true,
     });
