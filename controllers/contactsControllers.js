@@ -1,16 +1,11 @@
-const { HttpError, contactsSchemaValidation } = require("../helpers");
-const {
-  listContactsService,
-  getContactByIdService,
-  addContactService,
-  updateContactService,
-  removeContactService,
-} = require("../services/contactsServices");
+const { HttpError } = require("../helpers/");
+const { Contact, schemes } = require("../models/contact");
 
-// *  /api/contacts
+// *******************  /api/contacts  ******************
+
 const listContacts = async (req, res, next) => {
   try {
-    const contacts = await listContactsService();
+    const contacts = await Contact.find({}, "-createdAt -updatedAt");
     res.json(contacts);
   } catch (error) {
     next(error);
@@ -20,7 +15,7 @@ const listContacts = async (req, res, next) => {
 const getContactById = async (req, res, next) => {
   const { contactId } = req.params;
   try {
-    const contact = await getContactByIdService(contactId);
+    const contact = await Contact.findById(contactId);
 
     if (!contact) {
       throw new HttpError(404, `Contact with ${contactId} not found`);
@@ -34,11 +29,11 @@ const getContactById = async (req, res, next) => {
 
 const addContact = async (req, res, next) => {
   try {
-    const { error } = contactsSchemaValidation.validate(req.body);
+    const { error } = schemes.contactsSchemaValidation.validate(req.body);
     if (error) {
       throw new HttpError(400, error.message);
     }
-    const contact = await addContactService(req.body);
+    const contact = await Contact.create(req.body);
     res.status(201).json(contact);
   } catch (error) {
     next(error);
@@ -48,11 +43,32 @@ const addContact = async (req, res, next) => {
 const updateContact = async (req, res, next) => {
   const { contactId } = req.params;
   try {
-    const { error } = contactsSchemaValidation.validate(req.body);
+    const { error } = schemes.contactsSchemaValidation.validate(req.body);
     if (error) {
       throw new HttpError(400, error.message);
     }
-    const contact = await updateContactService(contactId, req.body);
+    const contact = await Contact.findByIdAndUpdate(contactId, req.body, {
+      new: true,
+    });
+    if (!contact) {
+      throw new HttpError(404, `Contact with ${contactId} not found`);
+    }
+    res.json(contact);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateStatusContact = async (req, res, next) => {
+  const { contactId } = req.params;
+  try {
+    const { error } = schemes.updateFavoriteSchemaValidation.validate(req.body);
+    if (error) {
+      throw new HttpError(400, error.message);
+    }
+    const contact = await Contact.findByIdAndUpdate(contactId, req.body, {
+      new: true,
+    });
     if (!contact) {
       throw new HttpError(404, `Contact with ${contactId} not found`);
     }
@@ -65,7 +81,7 @@ const updateContact = async (req, res, next) => {
 const removeContact = async (req, res, next) => {
   const { contactId } = req.params;
   try {
-    const removedContact = await removeContactService(contactId);
+    const removedContact = await Contact.findByIdAndRemove(contactId);
     if (!removedContact) {
       throw new HttpError(404, `Contact with ${contactId} not found`);
     }
@@ -80,5 +96,6 @@ module.exports = {
   getContactById,
   addContact,
   updateContact,
+  updateStatusContact,
   removeContact,
 };

@@ -1,21 +1,29 @@
 const express = require("express");
 const logger = require("morgan");
 const cors = require("cors");
-
+require("dotenv").config(); // * add variables fron .env to process.env
 const contactsRouter = require("./routes/api/contactsRouter");
 
 const app = express();
 
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 
+// *** middlewares:
 app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json());
 
+// *** main router:
 app.use("/api/contacts", contactsRouter);
 
+// *** error handlers:
 app.use((req, res) => {
-  res.status(404).json({ message: "Not found" });
+  res.status(404).json({
+    status: "error",
+    code: 404,
+    message: "Use api on routes: /api/contacts",
+    data: "Not found",
+  });
 });
 
 app.use((err, req, res, next) => {
