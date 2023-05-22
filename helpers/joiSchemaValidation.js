@@ -26,7 +26,7 @@ const joiContactsSchemaValidation = Joi.object({
   favorite: Joi.boolean(),
 });
 
-const joiUpdateFavoriteSchemaValidation = Joi.object({
+const joiUpdateStatusSchemaValidation = Joi.object({
   favorite: Joi.boolean()
     .required()
     .messages({ "any.required": "missing field favorite" }),
@@ -64,7 +64,7 @@ const joiLoginSchemaValidation = Joi.object({
 
 module.exports = {
   joiContactsSchemaValidation,
-  joiUpdateFavoriteSchemaValidation,
+  joiUpdateStatusSchemaValidation,
   joiRegisterSchemaValidation,
   joiLoginSchemaValidation,
 };

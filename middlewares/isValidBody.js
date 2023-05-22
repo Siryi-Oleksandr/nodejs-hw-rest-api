@@ -1,12 +1,14 @@
 const { HttpError } = require("../helpers");
-const joiSchemes = require("../helpers/joiSchemaValidation");
 
-const isValidBody = (req, res, next) => {
-  const { error } = joiSchemes.joiContactsSchemaValidation.validate(req.body);
-  if (error) {
-    next(new HttpError(400, error.message));
-  }
-  next();
+const isValidBody = (schema) => {
+  return (req, res, next) => {
+    const { error } = schema.validate(req.body);
+    if (error) {
+      next(new HttpError(422, error.message));
+      return;
+    }
+    next();
+  };
 };
 
 module.exports = isValidBody;

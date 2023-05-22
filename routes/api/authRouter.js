@@ -1,9 +1,19 @@
 const express = require("express");
-const isValidRegisterBody = require("../../middlewares/isValidRegisterBody");
-const { register } = require("../../controllers/userControllers");
+const {
+  register,
+  login,
+  logout,
+} = require("../../controllers/userControllers");
+const {
+  joiRegisterSchemaValidation,
+  joiLoginSchemaValidation,
+} = require("../../helpers/joiSchemaValidation");
+const { isValidBody } = require("../../middlewares");
 
 const router = express.Router();
 
-router.post("/register", isValidRegisterBody, register);
+router.post("/register", isValidBody(joiRegisterSchemaValidation), register);
+router.post("/login", isValidBody(joiLoginSchemaValidation), login);
+router.post("/logout", logout);
 
 module.exports = router;
