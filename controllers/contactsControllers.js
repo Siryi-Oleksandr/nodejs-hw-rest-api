@@ -5,7 +5,13 @@ const controllerWrapper = require("../helpers/controllerWrapper");
 // *******************  /api/contacts  ******************
 
 const getContacts = controllerWrapper(async (req, res) => {
-  const contacts = await Contact.find({}, "-createdAt -updatedAt");
+  const { _id: owner } = req.user;
+  const { page = 1, limit = 10 } = req.query;
+  const skip = (page - 1) * limit;
+  const contacts = await Contact.find({ owner }, "-createdAt -updatedAt", {
+    skip,
+    limit,
+  }).populate("owner", "name");
   res.json(contacts);
 });
 
@@ -21,7 +27,8 @@ const getContactById = controllerWrapper(async (req, res) => {
 });
 
 const addContact = controllerWrapper(async (req, res) => {
-  const contact = await Contact.create(req.body);
+  const { _id: owner } = req.user;
+  const contact = await Contact.create({ ...req.body, owner });
   res.status(201).json(contact);
 });
 

@@ -23,6 +23,10 @@ const userSchema = new Schema(
       minlength: 6,
       required: [true, "Password is required"],
     },
+    token: {
+      type: String,
+      default: "",
+    },
   },
   { versionKey: false, timestamps: true }
 );

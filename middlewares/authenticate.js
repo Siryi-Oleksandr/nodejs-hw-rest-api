@@ -12,11 +12,11 @@ const authenticate = async (req, res, next) => {
 
   try {
     const { id } = jwt.verify(token, SECRET_KEY);
-    const user = User.findById(id);
-    if (!user) {
+    const user = await User.findById(id);
+    if (!user || !user.token || user.token !== token) {
       throw new HttpError(401, "Not authorized");
     }
-    // req.user = user;
+    req.user = user; // add user to request and  we will have this info in controller
     next();
   } catch {
     next(new HttpError(401, "Not authorized"));
