@@ -7,7 +7,7 @@ const {
   updateStatusContact,
   removeContact,
 } = require("../../controllers/contactsControllers");
-const { isValidId, isValidBody } = require("../../middlewares");
+const { isValidId, isValidBody, authenticate } = require("../../middlewares");
 const {
   joiContactsSchemaValidation,
   joiUpdateStatusSchemaValidation,
@@ -15,14 +15,20 @@ const {
 
 const router = express.Router();
 
-router.get("/", getContacts);
+router.get("/", authenticate, getContacts);
 
-router.get("/:contactId", isValidId, getContactById);
+router.get("/:contactId", authenticate, isValidId, getContactById);
 
-router.post("/", isValidBody(joiContactsSchemaValidation), addContact);
+router.post(
+  "/",
+  authenticate,
+  isValidBody(joiContactsSchemaValidation),
+  addContact
+);
 
 router.put(
   "/:contactId",
+  authenticate,
   isValidId,
   isValidBody(joiContactsSchemaValidation),
   updateContact
@@ -30,11 +36,12 @@ router.put(
 
 router.patch(
   "/:contactId/favorite",
+  authenticate,
   isValidId,
   isValidBody(joiUpdateStatusSchemaValidation),
   updateStatusContact
 );
 
-router.delete("/:contactId", isValidId, removeContact);
+router.delete("/:contactId", authenticate, isValidId, removeContact);
 
 module.exports = router;
