@@ -18,7 +18,9 @@ const register = controllerWrapper(async (req, res) => {
   const hashPassword = await bcrypt.hash(password, 10);
 
   const newUser = await User.create({ ...req.body, password: hashPassword });
-  res.status(201).json({ email: newUser.email });
+  res
+    .status(201)
+    .json({ email: newUser.email, subscription: newUser.subscription });
 });
 
 const login = controllerWrapper(async (req, res) => {
@@ -37,16 +39,20 @@ const login = controllerWrapper(async (req, res) => {
   const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "23h" });
   await User.findByIdAndUpdate(user._id, { token });
 
-  res.json({ token });
+  res.json({
+    token,
+    user: {
+      email: user.email,
+      subscription: user.subscription,
+    },
+  });
 });
 
 const logout = controllerWrapper(async (req, res) => {
   const { _id } = req.user;
   await User.findByIdAndUpdate(_id, { token: "" });
 
-  res.json({
-    message: "Logout success",
-  });
+  res.status(204).json();
 });
 
 const updateStatusUser = controllerWrapper(async (req, res) => {
@@ -65,8 +71,8 @@ const updateStatusUser = controllerWrapper(async (req, res) => {
 });
 
 const getCurrent = controllerWrapper(async (req, res) => {
-  const { email } = req.user;
-  res.json({ email });
+  const { email, subscription } = req.user;
+  res.json({ email, subscription });
 });
 
 module.exports = {
