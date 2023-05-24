@@ -3,6 +3,7 @@ const logger = require("morgan");
 const cors = require("cors");
 require("dotenv").config(); // * add variables fron .env to process.env
 const contactsRouter = require("./routes/api/contactsRouter");
+const usersRouter = require("./routes/api/usersRouter");
 
 const app = express();
 
@@ -13,7 +14,8 @@ app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json());
 
-// *** main router:
+// *** main routers:
+app.use("/api/users", usersRouter);
 app.use("/api/contacts", contactsRouter);
 
 // *** error handlers:
