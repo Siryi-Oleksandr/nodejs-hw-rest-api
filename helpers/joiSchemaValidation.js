@@ -66,7 +66,10 @@ const joiLoginSchemaValidation = Joi.object({
 const joiUpdateSubscriptionUser = Joi.object({
   subscription: Joi.string()
     .valid(...subscriptionList)
-    .required(),
+    .required()
+    .messages({
+      "any.required": "Subscription field is required",
+    }),
 });
 
 module.exports = {

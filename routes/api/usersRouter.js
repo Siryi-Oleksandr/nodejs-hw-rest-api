@@ -19,7 +19,7 @@ router.post("/register", isValidBody(joiRegisterSchemaValidation), register);
 router.post("/login", isValidBody(joiLoginSchemaValidation), login);
 router.post("/logout", authenticate, logout);
 router.put(
-  "/updateSatus",
+  "/",
   authenticate,
   isValidBody(joiUpdateSubscriptionUser),
   updateStatusUser
