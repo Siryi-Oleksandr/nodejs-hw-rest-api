@@ -3,15 +3,10 @@ const { handleMongooseError } = require("../helpers");
 
 const emailRegex =
   /^([a-z0-9_-]+\.)*[a-z0-9_-]+@[a-z0-9_-]+(\.[a-z0-9_-]+)*\.[a-z]{2,6}$/;
+const subscriptionList = ["starter", "pro", "business"];
 
 const userSchema = new Schema(
   {
-    name: {
-      type: String,
-      minlength: 3,
-      maxlength: 35,
-      required: [true, "Name is required"],
-    },
     email: {
       type: String,
       match: emailRegex,
@@ -22,6 +17,11 @@ const userSchema = new Schema(
       type: String,
       minlength: 6,
       required: [true, "Password is required"],
+    },
+    subscription: {
+      type: String,
+      enum: subscriptionList,
+      default: subscriptionList[0], // "starter"
     },
     token: {
       type: String,

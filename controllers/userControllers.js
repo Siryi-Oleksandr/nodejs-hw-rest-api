@@ -18,7 +18,7 @@ const register = controllerWrapper(async (req, res) => {
   const hashPassword = await bcrypt.hash(password, 10);
 
   const newUser = await User.create({ ...req.body, password: hashPassword });
-  res.status(201).json({ name: newUser.name, email: newUser.email });
+  res.status(201).json({ email: newUser.email });
 });
 
 const login = controllerWrapper(async (req, res) => {
@@ -49,9 +49,24 @@ const logout = controllerWrapper(async (req, res) => {
   });
 });
 
+const updateStatusUser = controllerWrapper(async (req, res) => {
+  const { _id } = req.user;
+  const newStatus = req.body.subscription;
+  console.log("new status", newStatus);
+  const user = await User.findByIdAndUpdate(
+    _id,
+    { subscription: newStatus },
+    { new: true }
+  );
+
+  res.json({
+    user,
+  });
+});
+
 const getCurrent = controllerWrapper(async (req, res) => {
-  const { name, email } = req.user;
-  res.json({ name, email });
+  const { email } = req.user;
+  res.json({ email });
 });
 
 module.exports = {
@@ -59,4 +74,5 @@ module.exports = {
   login,
   logout,
   getCurrent,
+  updateStatusUser,
 };
