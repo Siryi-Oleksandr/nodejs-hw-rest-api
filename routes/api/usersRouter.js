@@ -4,6 +4,7 @@ const {
   login,
   logout,
   updateStatusUser,
+  updateAvatar,
   getCurrent,
 } = require("../../controllers/userControllers");
 const {
@@ -11,7 +12,7 @@ const {
   joiLoginSchemaValidation,
   joiUpdateSubscriptionUser,
 } = require("../../helpers/joiSchemaValidation");
-const { isValidBody, authenticate } = require("../../middlewares");
+const { isValidBody, authenticate, upload } = require("../../middlewares");
 
 const router = express.Router();
 
@@ -24,6 +25,7 @@ router.put(
   isValidBody(joiUpdateSubscriptionUser),
   updateStatusUser
 );
+router.patch("/avatars", authenticate, upload.single("avatar"), updateAvatar);
 router.get("/current", authenticate, getCurrent);
 
 module.exports = router;
