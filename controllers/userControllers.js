@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const gravatar = require("gravatar");
 const path = require("path");
-// const fs = require("fs/promises");
+const fs = require("fs/promises");
 const Jimp = require("jimp");
 
 const { SECRET_KEY } = process.env;
@@ -89,16 +89,14 @@ const updateAvatar = controllerWrapper(async (req, res) => {
   const fileName = `${_id}_${originalname}`;
   const resultUpload = path.join(avatarsDir, fileName);
 
-  await Jimp.read(tempUpload)
-    .then((image) => {
-      // Resize the image
-      image.cover(250, 250).write(resultUpload); // Save the resized image
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+  const image = await Jimp.read(tempUpload);
+  await image
+    .autocrop()
+    .cover(250, 250, Jimp.HORIZONTAL_ALIGN_CENTER || Jimp.VERTICAL_ALIGN_MIDDLE)
+    .write(tempUpload);
 
-  // await fs.rename(tempUpload, resultUpload);
+  await fs.rename(tempUpload, resultUpload);
+
   const avatarURL = path.join("avatars", fileName);
   await User.findByIdAndUpdate(_id, { avatarURL });
 
