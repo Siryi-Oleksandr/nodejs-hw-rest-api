@@ -2,6 +2,7 @@ const express = require("express");
 const logger = require("morgan");
 const cors = require("cors");
 require("dotenv").config(); // * add variables fron .env to process.env
+const path = require("path");
 const contactsRouter = require("./routes/api/contactsRouter");
 const usersRouter = require("./routes/api/usersRouter");
 
@@ -13,6 +14,7 @@ const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
 
 // *** main routers:
 app.use("/api/users", usersRouter);

@@ -9,10 +9,10 @@ const getContacts = controllerWrapper(async (req, res) => {
   const { page = 1, limit = 10, favorite } = req.query;
   const skip = (page - 1) * limit;
   const filter = { owner };
-  if (favorite && favorite === "true") {
+  if (favorite === "true") {
     filter.favorite = true;
   }
-  if (favorite && favorite === "false") {
+  if (favorite === "false") {
     filter.favorite = false;
   }
   const contacts = await Contact.find(filter, "-createdAt -updatedAt", {

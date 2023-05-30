@@ -3,8 +3,14 @@ const controllerWrapper = require("../helpers/controllerWrapper");
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const gravatar = require("gravatar");
+const path = require("path");
+const fs = require("fs/promises");
+const Jimp = require("jimp");
 
 const { SECRET_KEY } = process.env;
+
+const avatarsDir = path.join(__dirname, "../", "public", "avatars");
 
 // *******************  /api/users  ******************
 
@@ -16,8 +22,15 @@ const register = controllerWrapper(async (req, res) => {
   }
 
   const hashPassword = await bcrypt.hash(password, 10);
+  const avatarURL = gravatar.url(email, {
+    s: "250",
+  });
 
-  const newUser = await User.create({ ...req.body, password: hashPassword });
+  const newUser = await User.create({
+    ...req.body,
+    password: hashPassword,
+    avatarURL,
+  });
   res
     .status(201)
     .json({ email: newUser.email, subscription: newUser.subscription });
@@ -58,7 +71,6 @@ const logout = controllerWrapper(async (req, res) => {
 const updateStatusUser = controllerWrapper(async (req, res) => {
   const { _id } = req.user;
   const newStatus = req.body.subscription;
-  console.log("new status", newStatus);
   const user = await User.findByIdAndUpdate(
     _id,
     { subscription: newStatus },
@@ -67,6 +79,29 @@ const updateStatusUser = controllerWrapper(async (req, res) => {
 
   res.json({
     user,
+  });
+});
+
+const updateAvatar = controllerWrapper(async (req, res) => {
+  const { _id } = req.user;
+  const { path: tempUpload, originalname } = req.file;
+
+  const fileName = `${_id}_${originalname}`;
+  const resultUpload = path.join(avatarsDir, fileName);
+
+  const image = await Jimp.read(tempUpload);
+  await image
+    .autocrop()
+    .cover(250, 250, Jimp.HORIZONTAL_ALIGN_CENTER || Jimp.VERTICAL_ALIGN_MIDDLE)
+    .write(tempUpload);
+
+  await fs.rename(tempUpload, resultUpload);
+
+  const avatarURL = path.join("avatars", fileName);
+  await User.findByIdAndUpdate(_id, { avatarURL });
+
+  res.json({
+    avatarURL,
   });
 });
 
@@ -81,4 +116,5 @@ module.exports = {
   logout,
   getCurrent,
   updateStatusUser,
+  updateAvatar,
 };
