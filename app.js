@@ -5,6 +5,7 @@ require("dotenv").config(); // * add variables fron .env to process.env
 const path = require("path");
 const contactsRouter = require("./routes/api/contactsRouter");
 const usersRouter = require("./routes/api/usersRouter");
+const { sendEmail } = require("./helpers");
 
 const app = express();
 
@@ -29,6 +30,14 @@ app.use((req, res) => {
     data: "Not found",
   });
 });
+
+const contact = {
+  email: "AlexSiryi.FS@gmail.com", //
+  subject: "Nodemailer test",
+  text: "Привіт друже, радий повідомити наступне",
+};
+
+sendEmail(contact);
 
 app.use((err, req, res, next) => {
   const { status = 500, message = "Server error" } = err;
