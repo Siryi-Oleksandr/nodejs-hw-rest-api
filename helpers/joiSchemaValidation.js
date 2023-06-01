@@ -49,6 +49,13 @@ const joiRegisterSchemaValidation = Joi.object({
     .default(subscriptionList[0]),
 });
 
+const joiVerifyEmailSchema = Joi.object({
+  email: Joi.string()
+    .pattern(new RegExp(emailRegex))
+    .required()
+    .messages({ "any.required": "missing required field email" }),
+});
+
 const joiLoginSchemaValidation = Joi.object({
   email: Joi.string()
     .pattern(new RegExp(emailRegex))
@@ -78,4 +85,5 @@ module.exports = {
   joiRegisterSchemaValidation,
   joiLoginSchemaValidation,
   joiUpdateSubscriptionUser,
+  joiVerifyEmailSchema,
 };
